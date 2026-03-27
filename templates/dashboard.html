@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Dashboard</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+
+  <body class="dashboard-body">
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar">
+      <div class="logo">🔎 FridgeToTable</div>
+
+      <a href="/dashboard" class="active">
+        <i data-lucide="layout-dashboard"></i> Dashboard
+      </a>
+
+      <a href="/scan"> <i data-lucide="camera"></i> Scan Fridge </a>
+
+      <a href="/ingredients"><i data-lucide="carrot"></i> Ingredients</a>
+      <a href="/suggestions"
+        ><i data-lucide="utensils"></i> Recipe Suggestions</a
+      >
+      <a href="/saved"><i data-lucide="heart"></i> Saved Recipes</a>
+      <a><i data-lucide="history"></i> Cooking History</a>
+      <a><i data-lucide="apple"></i> Nutrition Info</a>
+      <a href="/profile"><i data-lucide="user"></i> Profile</a>
+
+      <br />
+
+      <a href="/logout" class="logout">
+        <i data-lucide="log-out"></i> Logout
+      </a>
+    </div>
+
+    <!-- ===== TOPBAR ===== -->
+    <div class="topbar">
+      <div class="top-right">
+        <i data-lucide="user" class="icon"></i>
+        <span class="username">{{ user }}</span>
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          ☀️ Light
+        </button>
+        <i data-lucide="menu" class="icon menu-icon"></i>
+      </div>
+    </div>
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main">
+      <!-- Welcome Card -->
+      <div class="welcome">
+        <h1>Welcome {{ user }} 👋</h1>
+        <p>Start scanning your fridge and get smart recipes.</p>
+      </div>
+
+      <!-- Dashboard Stats -->
+      <div class="cards">
+        <div class="card">
+          <h3>Total Ingredients</h3>
+          <p>{{ ingredient_count }}</p>
+        </div>
+        <div class="card">
+          <h3>Saved Recipes</h3>
+          <p>{{ recipe_count }}</p>
+        </div>
+        <div class="card">
+          <h3>Messages</h3>
+          <p>{{ message_count }}</p>
+        </div>
+        <div class="card">
+          <h3>Health Warnings</h3>
+          <p>{{ warnings }}</p>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <a href="/scan" class="action-btn">Scan Fridge</a>
+        <a href="/ingredients" class="action-btn">View Ingredients</a>
+        <a href="/saved" class="action-btn">Saved Recipes</a>
+      </div>
+
+      <div class="recent-row">
+        <div class="recent-block">
+          <h3>Recent Saved Recipes</h3>
+          {% if recent_recipes %}
+          <ul>
+            {% for recipe in recent_recipes %}
+            <li>
+              {{ recipe.recipe_text|truncate(80) }} - {{
+              recipe.created_at.strftime('%b %d') }}
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p>No saved recipes yet.</p>
+          {% endif %}
+        </div>
+
+        <div class="recent-block">
+          <h3>Recent Ingredients</h3>
+          {% if recent_ingredients %}
+          <ul>
+            {% for ingred in recent_ingredients %}
+            <li>
+              {{ ingred.name }} - {{ ingred.health_analysis|truncate(60) }}
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p>No ingredients yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

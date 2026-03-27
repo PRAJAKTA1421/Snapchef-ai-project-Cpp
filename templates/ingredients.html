@@ -1,0 +1,311 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Ingredients</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+
+  <body class="dashboard-body">
+    <div class="sidebar">
+      <div class="logo">🔎 FridgeToTable</div>
+      <a href="/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+      <a href="/scan"><i data-lucide="camera"></i> Scan Fridge</a>
+      <a class="active" href="/ingredients"
+        ><i data-lucide="carrot"></i> Ingredients</a
+      >
+      <a href="/suggestions"
+        ><i data-lucide="utensils"></i> Recipe Suggestions</a
+      >
+      <a href="/saved"><i data-lucide="heart"></i> Saved Recipes</a>
+      <a><i data-lucide="history"></i> Cooking History</a>
+      <a><i data-lucide="apple"></i> Nutrition Info</a>
+      <a href="/profile"><i data-lucide="user"></i> Profile</a>
+      <br />
+      <a href="/logout" class="logout"><i data-lucide="log-out"></i> Logout</a>
+    </div>
+
+    <div class="topbar">
+      <div></div>
+      <div class="top-right">
+        <i data-lucide="user"></i>
+        <span>{{ user }}</span>
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          ☀️ Light
+        </button>
+        <i data-lucide="menu"></i>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="chat-box">
+        <h2 style="color: #333">Ingredient List</h2>
+
+        <!-- Add Ingredient Form -->
+        <form
+          method="POST"
+          action="/add_ingredient"
+          style="
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+          "
+        >
+          <h3 style="color: #333">Add New Ingredient</h3>
+          <input
+            type="text"
+            name="ingredient_name"
+            placeholder="Enter ingredient name"
+            required
+            style="
+              padding: 8px;
+              margin-right: 10px;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+            "
+          />
+          <button
+            type="submit"
+            style="
+              padding: 8px 15px;
+              background: #4caf50;
+              color: white;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+            "
+          >
+            Add Ingredient
+          </button>
+        </form>
+
+        {% if ingredients %}
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+          "
+        >
+          {% for item in ingredients %}
+          <div
+            style="
+              border: 1px solid #eee;
+              padding: 15px;
+              border-radius: 8px;
+              background: #f9f9f9;
+              color: #333;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+              "
+            >
+              <span style="font-weight: bold; font-size: 16px; color: #333"
+                >{{ item.name }}</span
+              >
+              <form
+                method="POST"
+                action="/delete_ingredient/{{ item.id }}"
+                style="display: inline"
+              >
+                <button
+                  type="submit"
+                  style="
+                    background: #f44336;
+                    color: white;
+                    border: none;
+                    padding: 2px 6px;
+                    border-radius: 3px;
+                    cursor: pointer;
+                    font-size: 12px;
+                  "
+                >
+                  ×
+                </button>
+              </form>
+            </div>
+
+            {% if item.health_analysis %}
+            <div
+              style="
+                background: white;
+                padding: 10px;
+                border-radius: 6px;
+                border-left: 4px solid #4caf50;
+                margin-top: 10px;
+              "
+            >
+              <h4 style="margin: 0 0 8px 0; color: #2e7d32; font-size: 14px">
+                🏥 Health Analysis
+              </h4>
+              <div style="font-size: 13px; line-height: 1.4; color: #555">
+                {{ item.health_analysis | replace('\n', '<br />') | safe }}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: #333">
+          No ingredients found yet. Add some by typing them in the Scan box
+          (comma-separated or new lines).
+        </p>
+
+        <!-- Quick Add Unique Ingredients -->
+        <div style="margin-top: 20px">
+          <h3 style="color: #333">Quick Add Unique Ingredients</h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px">
+            <form
+              method="POST"
+              action="/add_ingredient"
+              style="display: inline"
+            >
+              <input type="hidden" name="ingredient_name" value="Truffle Oil" />
+              <button
+                type="submit"
+                style="
+                  padding: 5px 10px;
+                  background: #ff6b6b;
+                  color: white;
+                  border: none;
+                  border-radius: 15px;
+                  cursor: pointer;
+                "
+              >
+                🍄 Truffle Oil
+              </button>
+            </form>
+            <form
+              method="POST"
+              action="/add_ingredient"
+              style="display: inline"
+            >
+              <input
+                type="hidden"
+                name="ingredient_name"
+                value="Saffron Threads"
+              />
+              <button
+                type="submit"
+                style="
+                  padding: 5px 10px;
+                  background: #ffd93d;
+                  color: black;
+                  border: none;
+                  border-radius: 15px;
+                  cursor: pointer;
+                "
+              >
+                🌸 Saffron
+              </button>
+            </form>
+            <form
+              method="POST"
+              action="/add_ingredient"
+              style="display: inline"
+            >
+              <input
+                type="hidden"
+                name="ingredient_name"
+                value="Goji Berries"
+              />
+              <button
+                type="submit"
+                style="
+                  padding: 5px 10px;
+                  background: #ff8e53;
+                  color: white;
+                  border: none;
+                  border-radius: 15px;
+                  cursor: pointer;
+                "
+              >
+                🫐 Goji Berries
+              </button>
+            </form>
+            <form
+              method="POST"
+              action="/add_ingredient"
+              style="display: inline"
+            >
+              <input
+                type="hidden"
+                name="ingredient_name"
+                value="Matcha Powder"
+              />
+              <button
+                type="submit"
+                style="
+                  padding: 5px 10px;
+                  background: #4ecdc4;
+                  color: white;
+                  border: none;
+                  border-radius: 15px;
+                  cursor: pointer;
+                "
+              >
+                🍵 Matcha
+              </button>
+            </form>
+            <form
+              method="POST"
+              action="/add_ingredient"
+              style="display: inline"
+            >
+              <input type="hidden" name="ingredient_name" value="Quinoa" />
+              <button
+                type="submit"
+                style="
+                  padding: 5px 10px;
+                  background: #45b7d1;
+                  color: white;
+                  border: none;
+                  border-radius: 15px;
+                  cursor: pointer;
+                "
+              >
+                🌾 Quinoa
+              </button>
+            </form>
+            <form
+              method="POST"
+              action="/add_ingredient"
+              style="display: inline"
+            >
+              <input type="hidden" name="ingredient_name" value="Kale" />
+              <button
+                type="submit"
+                style="
+                  padding: 5px 10px;
+                  background: #96ceb4;
+                  color: white;
+                  border: none;
+                  border-radius: 15px;
+                  cursor: pointer;
+                "
+              >
+                🥬 Kale
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

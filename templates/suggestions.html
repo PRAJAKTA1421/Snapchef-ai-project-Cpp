@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Recipe Suggestions</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+
+  <body class="dashboard-body">
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar">
+      <div class="logo">🔎 FridgeToTable</div>
+
+      <a href="/dashboard">
+        <i data-lucide="layout-dashboard"></i> Dashboard
+      </a>
+
+      <a href="/scan"> <i data-lucide="camera"></i> Scan Fridge </a>
+
+      <a href="/ingredients"><i data-lucide="carrot"></i> Ingredients</a>
+      <a href="/suggestions" class="active"
+        ><i data-lucide="utensils"></i> Recipe Suggestions</a
+      >
+      <a href="/saved"><i data-lucide="heart"></i> Saved Recipes</a>
+      <a><i data-lucide="history"></i> Cooking History</a>
+      <a><i data-lucide="apple"></i> Nutrition Info</a>
+      <a href="/profile"><i data-lucide="user"></i> Profile</a>
+
+      <br />
+
+      <a href="/logout" class="logout">
+        <i data-lucide="log-out"></i> Logout
+      </a>
+    </div>
+
+    <!-- ===== TOPBAR ===== -->
+    <div class="topbar">
+      <div class="top-right">
+        <i data-lucide="user" class="icon"></i>
+        <span class="username">{{ user }}</span>
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          ☀️ Light
+        </button>
+        <i data-lucide="menu" class="icon menu-icon"></i>
+      </div>
+    </div>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <div class="main">
+      <div class="page-header">
+        <h1>Recipe Suggestions</h1>
+        <p>Browse our collection of 25 delicious recipes</p>
+      </div>
+
+      <!-- Recipes Grid -->
+      <div class="recipes-section">
+        <div class="recipes-grid">
+          {% for recipe in recipes %}
+          <div class="recipe-card">
+            <div class="recipe-header">
+              <h3>{{ recipe.title }}</h3>
+              <div class="recipe-meta">
+                <span class="time">⏱️ {{ recipe.time }}</span>
+                <span class="difficulty">🎯 {{ recipe.difficulty }}</span>
+              </div>
+            </div>
+
+            <div class="recipe-ingredients">
+              <h4>Ingredients:</h4>
+              <p>{{ recipe.ingredients }}</p>
+            </div>
+
+            <div class="recipe-instructions">
+              <h4>Instructions:</h4>
+              <p>{{ recipe.instructions }}</p>
+            </div>
+
+            <div class="recipe-actions">
+              <form method="POST" action="/save_recipe">
+                <input
+                  type="hidden"
+                  name="recipe_text"
+                  value="{{ recipe.title }}: {{ recipe.ingredients }} | {{ recipe.instructions }}"
+                />
+                <button type="submit" class="save-btn">Save Recipe</button>
+              </form>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

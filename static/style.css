@@ -1,0 +1,968 @@
+/* ===== GLOBAL ===== */
+:root {
+    --bg-color: #020617;
+    --text-color: #f8fafc;
+    --muted-color: #94a3b8;
+    --accent-color: #22d3ee;
+    --panel-bg: rgba(15, 23, 42, 0.8);
+    --card-bg: linear-gradient(145deg, #0b0f1e, #111827);
+    --card-border: #134e72;
+    --sidebar-bg: #020617;
+    --topbar-bg: #020617;
+    --card-shadow: 0 10px 20px rgba(0,0,0,.2);
+    --button-bg: linear-gradient(90deg, #14b8a6, #22d3ee);
+    --button-color: #000;
+}
+
+body.light-mode {
+    --bg-color: #f4f6fb;
+    --text-color: #1f2937;
+    --muted-color: #6b7280;
+    --accent-color: #0f766e;
+    --panel-bg: rgba(255, 255, 255, 0.9);
+    --card-bg: linear-gradient(145deg, #ffffff, #f1f5f9);
+    --card-border: #d1d5db;
+    --sidebar-bg: #ffffff;
+    --topbar-bg: #ffffff;
+    --card-shadow: 0 10px 20px rgba(0,0,0,.12);
+    --button-bg: linear-gradient(90deg, #34d399, #6ee7b7);
+    --button-color: #0f172a;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background: var(--bg-color);
+    color: var(--text-color);
+}
+
+/* ===== LOGIN / SIGNUP (GLASS UI) ===== */
+.auth-body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(145deg, #08101e, #051f39, #0f3d3e);
+    background-size: 400% 400%;
+    position: relative;
+    animation: bg-shift 15s ease infinite;
+}
+
+@keyframes bg-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* Glow effect */
+.auth-body::before {
+    content: "";
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: #14b8a6;
+    filter: blur(180px);
+    opacity: 0.25;
+    top: -100px;
+    left: -100px;
+}
+
+/* Heading */
+.auth-header {
+    position: absolute;
+    top: 80px;
+    text-align: center;
+}
+
+.auth-header h1 {
+    font-size: 40px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.auth-header p {
+    color: var(--accent-color);
+    font-size: 20px;
+}
+
+.auth-navbar {
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    right: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.auth-navbar .brand {
+    color: #22d3ee;
+    font-size: 28px;
+    font-weight: 700;
+    text-shadow: 0 2px 10px rgba(34,211,238,0.5);
+}
+
+.auth-navbar .nav-links a {
+    display: inline-block;
+    margin-left: 12px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 600;
+    color: #dbeafe;
+    background: rgba(15,23,42,0.4);
+    transition: .2s;
+}
+
+.auth-navbar .nav-links a.active,
+.auth-navbar .nav-links a:hover {
+    background: rgba(34,211,238,0.3);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.theme-bar {
+    position: absolute;
+    top: 22px;
+    right: 140px;
+}
+
+/* Glass Card */
+.auth-card {
+    width: 340px;
+    padding: 30px;
+    border-radius: 20px;
+    background: var(--panel-bg);
+    backdrop-filter: blur(25px);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 0 40px rgba(0,0,0,0.5);
+}
+
+.auth-card-header h2 {
+    color: var(--text-color);
+    font-size: 28px;
+    margin-bottom: 6px;
+}
+
+.auth-card-header p {
+    color: var(--muted-color);
+    margin-bottom: 20px;
+}
+
+.animated-card {
+    animation: pop-in 0.45s ease-out;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.animated-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.45);
+}
+
+@keyframes pop-in {
+    from {opacity: 0; transform: translateY(20px) scale(0.95);}
+    to {opacity: 1; transform: translateY(0) scale(1);}
+}
+
+/* Inputs */
+.input-group {
+    margin: 15px 0;
+    position: relative;
+}
+
+..input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    outline: none;
+    background: rgba(255,255,255,0.18);
+    color: var(--text-color);
+    font-size: 16px;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+    transition: all 0.25s ease;
+}
+
+.input-group input::placeholder {
+    color: rgba(148, 163, 184, 0.8);
+}
+
+.input-group input:focus {
+    border-color: rgba(34, 211, 238, 0.8);
+    box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.2);
+    background: rgba(255,255,255,0.9);
+    color: #0f172a;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: var(--accent-color);
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.remember-me input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.remember-me label {
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+/* Button */
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    border-radius: 10px;
+    border: none;
+    background: var(--button-bg);
+    color: var(--button-color);
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* ===== DASHBOARD ===== */
+.dashboard-body {
+    background: var(--bg-color);
+}
+
+/* Sidebar */
+/* Sidebar */
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: var(--sidebar-bg);
+    padding: 20px;
+    border-right: 1px solid var(--card-border);
+    z-index: 1100;
+}
+
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 240px;
+    right: 0;
+    height: 60px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 30px;
+    background: var(--topbar-bg);
+    border-bottom: 1px solid var(--card-border);
+    z-index: 1050;
+}
+
+.theme-toggle {
+    border: 1px solid var(--card-border);
+    background: var(--button-bg);
+    color: var(--button-color);
+    padding: 8px 12px;
+    margin-left: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.theme-toggle:hover {
+    opacity: 0.9;
+}
+
+.theme-bar {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+}
+
+/* Logo */
+.logo {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin-bottom: 30px;
+}
+
+/* Menu items */
+.sidebar a {
+    display: block;
+    color: var(--muted-color);
+    padding: 12px 15px;
+    margin: 6px 0;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+/* Active (Dashboard highlight) */
+.sidebar a.active {
+    background: var(--card-border);
+    color: var(--accent-color);
+}
+
+/* Hover */
+.sidebar a:hover {
+    background: var(--card-border);
+    color: var(--text-color);
+}
+
+/* Logout */
+.logout {
+    color: red;
+    margin-top: 20px;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: #22d3ee;
+    margin-bottom: 30px;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar i {
+    width: 18px;
+    height: 18px;
+}
+
+.sidebar a:hover {
+    background: #0f172a;
+    color: white;
+}
+
+/* Main */
+.main {
+    margin-left: 240px;
+    padding: 40px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 20px 0;
+}
+
+.card {
+    border-radius: 14px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 18px;
+    box-shadow: var(--card-shadow);
+}
+
+.card h3 {
+    font-size: 14px;
+    color: var(--muted-color);
+    margin-bottom: 8px;
+}
+
+.card p {
+    font-size: 26px;
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 16px 0 24px;
+}
+
+.action-btn {
+    padding: 10px 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: var(--button-bg);
+    text-decoration: none;
+    color: var(--button-color);
+}
+
+.recent-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 24px;
+}
+
+.recent-block {
+    background: var(--panel-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 15px;
+}
+
+.recent-block h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: var(--text-color);
+}
+
+.recent-block ul {
+    list-style: none;
+}
+
+.recent-block li {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--card-border);
+    color: var(--muted-color);
+    font-size: 14px;
+}
+
+.recent-block li:last-child {
+    border-bottom: none;
+}
+
+/* ===== SUGGESTIONS PAGE ===== */
+.page-header {
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.page-header p {
+    color: var(--muted-color);
+    font-size: 16px;
+}
+
+.ingredients-section {
+    margin-bottom: 40px;
+}
+
+.ingredients-section h2 {
+    font-size: 24px;
+    margin-bottom: 16px;
+}
+
+.ingredients-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.ingredient-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px;
+    transition: transform 0.2s;
+}
+
+.ingredient-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-color);
+}
+
+.ingredient-card h4 {
+    color: var(--accent-color);
+    margin-bottom: 8px;
+}
+
+.ingredient-card p {
+    color: var(--muted-color);
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.suggestions-section h2 {
+    font-size: 24px;
+    margin-bottom: 16px;
+}
+
+.suggestions-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+.suggestion-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: var(--card-shadow);
+}
+
+.suggestion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.suggestion-header h3 {
+    color: #22d3ee;
+    font-size: 20px;
+}
+
+.save-btn {
+    padding: 8px 16px;
+    background: linear-gradient(90deg, #14b8a6, #22d3ee);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.save-btn:hover {
+    transform: scale(1.05);
+}
+
+.suggestion-content {
+    color: #cbd5e1;
+    line-height: 1.6;
+}
+
+.suggestion-content pre {
+    white-space: pre-wrap;
+    font-family: inherit;
+    margin: 0;
+    font-size: 14px;
+}
+
+.no-suggestions {
+    text-align: center;
+    padding: 40px;
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 16px;
+    border: 1px solid #1e293b;
+}
+
+.no-suggestions p {
+    color: #94a3b8;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.no-suggestions .action-btn {
+    display: inline-block;
+    margin: 0 10px;
+    padding: 12px 20px;
+    background: linear-gradient(90deg, #14b8a6, #22d3ee);
+    color: #000;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: transform 0.2s;
+}
+
+.no-suggestions .action-btn:hover {
+    transform: scale(1.05);
+}
+
+/* ===== RECIPES PAGE ===== */
+.recipes-section {
+    margin-top: 20px;
+}
+
+.recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.recipe-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s;
+}
+
+.recipe-card:hover {
+    transform: translateY(-5px);
+}
+
+.recipe-header {
+    margin-bottom: 15px;
+}
+
+.recipe-header h3 {
+    color: #22d3ee;
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.recipe-meta {
+    display: flex;
+    gap: 15px;
+}
+
+.recipe-meta span {
+    font-size: 12px;
+    color: #94a3b8;
+    background: rgba(20, 184, 166, 0.1);
+    padding: 4px 8px;
+    border-radius: 12px;
+}
+
+.recipe-ingredients,
+.recipe-instructions {
+    margin-bottom: 15px;
+}
+
+.recipe-ingredients h4,
+.recipe-instructions h4 {
+    color: #cbd5e1;
+    font-size: 14px;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.recipe-ingredients p,
+.recipe-instructions p {
+    color: #cbd5e1;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.recipe-actions {
+    text-align: center;
+    margin-top: 15px;
+}
+
+/* Welcome only */
+.welcome-box {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.auth-link a {
+    color: #22d3ee;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+body.light-mode .auth-body {
+    background: radial-gradient(circle at top, #e2e8f0, #f8fafc);
+}
+
+body.light-mode .auth-card,
+body.light-mode .sidebar,
+body.light-mode .topbar,
+body.light-mode .card,
+body.light-mode .recent-block,
+body.light-mode .ingredient-card,
+body.light-mode .suggestion-card,
+body.light-mode .recipe-card {
+    background: #ffffff;
+    color: #1f2937;
+}
+
+body.light-mode .sidebar {
+    border-right: 1px solid #d1d5db;
+}
+
+body.light-mode .topbar {
+    border-bottom: 1px solid #d1d5db;
+}
+
+body.light-mode .sidebar a,
+body.light-mode .recent-block li,
+body.light-mode .ingredient-card p,
+body.light-mode .recipe-meta span,
+body.light-mode .page-header p {
+    color: #4b5563;
+}
+
+body.light-mode .auth-card,
+body.light-mode .input-group input {
+    background: #ffffff;
+    border-color: #d1d5db;
+}
+
+body.light-mode .auth-link a {
+    color: #0f766e;
+}
+
+
+.auth-link a:hover {
+    text-decoration: underline;
+}
+
+/* Auth top navbar */
+.auth-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background: rgba(2, 6, 23, 0.95);
+    border-bottom: 1px solid #0f172a;
+    z-index: 2000;
+}
+
+.auth-navbar .brand {
+    font-size: 20px;
+    font-weight: bold;
+    color: #22d3ee;
+}
+
+.auth-navbar .nav-links a {
+    margin-left: 15px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.auth-navbar .nav-links a:hover {
+    background: #0f172a;
+    color: #ffffff;
+}
+
+.auth-body {
+    padding-top: 60px;
+}
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 240px;
+    right: 0;
+    height: 60px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 30px;
+    background: #020617;
+    border-bottom: 1px solid #0f172a;
+    z-index: 1000;
+}
+
+/* Menu icon */
+.menu-icon {
+    margin-left: 20px;
+    cursor: pointer;
+    color: #22d3ee;
+}
+
+/* Profile */
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #0ecce9;
+}
+
+/* Adjust main content */
+.main {
+    margin-left: 240px;
+    padding: 80px 40px; /* top space for navbar */
+}/* Chat area */
+.chat-box {
+    height: calc(100vh - 140px);
+    overflow-y: auto;
+    padding: 20px;
+}
+
+/* Messages */
+.message {
+    margin: 10px 0;
+}
+
+.message.user {
+    text-align: right;
+}
+
+.message.bot {
+    text-align: left;
+    color: #22d3ee;
+}
+
+.message img {
+    max-width: 200px;
+    border-radius: 10px;
+}
+
+/* Input bottom fix */
+.chat-input {
+    position: fixed;
+    bottom: 20px;
+    left: 260px;   /* sidebar width */
+    right: 40px;
+    display: flex;
+    gap: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+}
+
+.chat-input button {
+    background: #22d3ee;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+}/* Topbar right section */
+.top-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;   /* spacing between items */
+}
+
+/* Username */
+.username {
+    color: #22d3ee;
+    font-weight: 500;
+}
+
+/* Icons */
+.icon {
+    width: 20px;
+    height: 20px;
+    color: #22d3ee;   /* 👈 change color */
+    cursor: pointer;
+}
+
+/* Menu icon extra spacing */
+.menu-icon {
+    margin-left: 10px;
+}/* Chat Input Container */
+.chat-input-box {
+    position: fixed;
+    bottom: 20px;
+    left: 300px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    background: #111827;
+    padding: 10px 15px;
+    border-radius: 50px;
+    border: 1px solid #1f2937;
+}
+
+/* Input */
+.chat-input-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 15px;
+    margin: 0 10px;
+}
+
+/* Plus Button */
+.plus-btn {
+    width: 30px;
+    height: 30px;
+    background: #1f2937;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+/* Upload Menu */
+.upload-menu {
+    position: absolute;
+    bottom: 60px;
+    left: 10px;
+    background: #1f2937;
+    border-radius: 10px;
+    padding: 10px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    width: 200px;
+}
+
+.upload-menu div,
+.upload-menu label {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.upload-menu div:hover,
+.upload-menu label:hover {
+    background: #374151;
+    border-radius: 6px;
+}
+
+/* Icons */
+.icon {
+    color: #9ca3af;
+    margin-right: 10px;
+}
+
+/* Send Button */
+.send-btn {
+    background: #22d3ee;
+    border: none;
+    border-radius: 50%;
+    padding: 8px;
+    cursor: pointer;
+}#preview {
+    margin-right: 10px;
+}.chat-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message {
+  max-width: 60%;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+/* USER RIGHT */
+.message.user {
+  align-self: flex-end;
+  background: #00c6ff;
+  color: black;
+}
+
+/* BOT LEFT */
+.message.bot {
+  align-self: flex-start;
+  background: #1e293b;
+  color: white;
+}
+
+.message img {
+  width: 120px;
+  border-radius: 10px;
+  margin-bottom: 5px;
+}

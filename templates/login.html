@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Login</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+
+  <body class="auth-body">
+    <div class="auth-navbar">
+      <div class="brand">SnapChef</div>
+      <div class="nav-links">
+        <a href="/login">Login</a>
+        <a href="/signup">Register</a>
+      </div>
+    </div>
+    <div class="theme-bar">
+      <button id="theme-toggle" class="theme-toggle" type="button">
+        ☀️ Light
+      </button>
+    </div>
+
+    <div class="auth-header">
+      <h1>Build with Confidence</h1>
+      <p>Deploy with Ease</p>
+    </div>
+
+    <div class="auth-card animated-card">
+      <div class="auth-card-header">
+        <h2>Welcome Back</h2>
+        <p>Access your fridge recipe companion</p>
+      </div>
+
+      <form method="POST">
+        <div class="input-group">
+          <input type="text" name="username" placeholder="Username" required />
+        </div>
+
+        <div class="input-group">
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            required
+            id="password"
+          />
+          <span class="password-toggle" onclick="togglePassword()">
+            <i data-lucide="eye"></i>
+          </span>
+        </div>
+
+        <div class="remember-me">
+          <input type="checkbox" name="remember" id="remember" />
+          <label for="remember">Remember me</label>
+        </div>
+
+        <button class="auth-btn">Login</button>
+        <div class="auth-link">
+          Don't have an account?
+          <a href="/signup">Register</a>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      function togglePassword() {
+        const pwd = document.getElementById("password");
+        const icon = document.querySelector(".password-toggle i");
+        if (pwd.type === "password") {
+          pwd.type = "text";
+          icon.setAttribute("data-lucide", "eye-off");
+        } else {
+          pwd.type = "password";
+          icon.setAttribute("data-lucide", "eye");
+        }
+        lucide.createIcons();
+      }
+
+      const savedUsername = localStorage.getItem("snapchef_username");
+      if (savedUsername) {
+        document.querySelector('input[name="username"]').value = savedUsername;
+        document.getElementById("remember").checked = true;
+      }
+
+      document.querySelector("form").addEventListener("submit", function () {
+        if (document.getElementById("remember").checked) {
+          localStorage.setItem(
+            "snapchef_username",
+            document.querySelector('input[name="username"]').value,
+          );
+        } else {
+          localStorage.removeItem("snapchef_username");
+        }
+      });
+    </script>
+
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </body>
+</html>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+  <body class="dashboard-body">
+    <div class="sidebar">
+      <div class="logo">🔎 FridgeToTable</div>
+      <a href="/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+      <a href="/scan"><i data-lucide="camera"></i> Scan Fridge</a>
+      <a href="/ingredients"><i data-lucide="carrot"></i> Ingredients</a>
+      <a href="/suggestions"><i data-lucide="utensils"></i> Recipe Suggestions</a>
+      <a href="/saved"><i data-lucide="heart"></i> Saved Recipes</a>
+      <a><i data-lucide="history"></i> Cooking History</a>
+      <a><i data-lucide="apple"></i> Nutrition Info</a>
+      <a class="active" href="/profile"><i data-lucide="user"></i> Profile</a>
+      <br />
+      <a href="/logout" class="logout"><i data-lucide="log-out"></i> Logout</a>
+    </div>
+    <div class="topbar">
+      <div class="top-right">
+        <i data-lucide="user" class="icon"></i>
+        <span class="username">{{ user }}</span>
+        <button id="theme-toggle" class="theme-toggle" type="button">☀️ Light</button>
+        <i data-lucide="menu" class="icon menu-icon"></i>
+      </div>
+    </div>
+    <div class="main">
+      <div class="welcome">
+        <h1>👤 Your Profile</h1>
+        <p>Manage your personal information and dietary preferences</p>
+      </div>
+      <div class="cards">
+        <form method="POST" action="/update_profile" style="grid-column: 1 / -1">
+          <div style="background: rgba(31, 194, 222, 0.1); border: 1px solid #1fc2de; border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; color: #1fc2de; font-weight: bold;">Full Name</label>
+              <input type="text" name="full_name" value="{{ full_name or '' }}" placeholder="Enter your full name" style="width: 100%; padding: 10px; border: 1px solid #1fc2de; border-radius: 5px; background: rgba(255,255,255,0.05); color: #fff;" />
+            </div>
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; color: #1fc2de; font-weight: bold;">Email</label>
+              <input type="email" name="email" value="{{ email or '' }}" placeholder="Enter your email" style="width: 100%; padding: 10px; border: 1px solid #1fc2de; border-radius: 5px; background: rgba(255,255,255,0.05); color: #fff;" />
+            </div>
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; color: #1fc2de; font-weight: bold;">Dietary Preference</label>
+              <select name="dietary_preference" style="width: 100%; padding: 10px; border: 1px solid #1fc2de; border-radius: 5px; background: rgba(255,255,255,0.05); color: #fff;">
+                <option value="">-- Select Preference --</option>
+                <option value="Omnivore" {% if dietary_preference == 'Omnivore' %}selected{% endif %}>Omnivore</option>
+                <option value="Vegetarian" {% if dietary_preference == 'Vegetarian' %}selected{% endif %}>Vegetarian</option>
+                <option value="Vegan" {% if dietary_preference == 'Vegan' %}selected{% endif %}>Vegan</option>
+                <option value="Keto" {% if dietary_preference == 'Keto' %}selected{% endif %}>Keto</option>
+                <option value="Gluten-Free" {% if dietary_preference == 'Gluten-Free' %}selected{% endif %}>Gluten-Free</option>
+                <option value="Dairy-Free" {% if dietary_preference == 'Dairy-Free' %}selected{% endif %}>Dairy-Free</option>
+                <option value="Paleo" {% if dietary_preference == 'Paleo' %}selected{% endif %}>Paleo</option>
+              </select>
+            </div>
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; color: #1fc2de; font-weight: bold;">Allergies 🚨</label>
+              <textarea name="allergies" placeholder="List any allergies (e.g., peanuts, shellfish, dairy, etc.)" style="width: 100%; padding: 10px; border: 1px solid #1fc2de; border-radius: 5px; background: rgba(255,255,255,0.05); color: #fff; height: 80px; resize: vertical; font-family: inherit;">{{ allergies or '' }}</textarea>
+            </div>
+            <button type="submit" style="background: #1fc2de; color: #000; border: none; padding: 12px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 16px; transition: all 0.3s;">💾 Save Changes</button>
+          </div>
+        </form>
+        <div class="card">
+          <h3>📊 Tracked Ingredients</h3>
+          <p style="font-size: 24px; color: #1fc2de; font-weight: bold;">{{ total_ingredients }}</p>
+        </div>
+        <div class="card">
+          <h3>⚠️ Health Warnings</h3>
+          <p style="font-size: 24px; color: #ff6b6b; font-weight: bold;">{{ warnings }}</p>
+        </div>
+      </div>
+      <div class="recent-row">
+        <div class="recent-block" style="grid-column: 1 / -1;">
+          <h3>📈 Ingredient Category Distribution</h3>
+          <canvas id="categoryChart" style="width: 100%; height: 300px;"></canvas>
+        </div>
+      </div>
+      <div class="recent-row">
+        <div class="recent-block">
+          <h3>🥗 Your Ingredients</h3>
+          {% if ingredients %}
+          <ul style="list-style: none; padding: 0;">
+            {% for ing in ingredients %}
+            <li style="margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+              <strong style="color: #1fc2de;">{{ ing.name }}</strong><br />
+              <small style="color: #aaa;">{{ ing.health_analysis | truncate(150) }}</small>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p>No ingredients tracked yet. Start by using Scan Fridge!</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <script>
+      lucide.createIcons();
+      const ctx = document.getElementById('categoryChart');
+      if (ctx) {
+        new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels: {{ chart_labels | tojson }},
+            datasets: [{
+              label: 'Ingredient categories',
+              data: {{ chart_data | tojson }},
+              backgroundColor: ['#34d399', '#4f46e5', '#f59e0b', '#0ea5e9', '#f472b6', '#f97316', '#14b8a6'],
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+          },
+        });
+      }
+    </script>
+  </body>
+</html>

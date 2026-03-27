@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Saved Recipes</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+
+  <body class="dashboard-body">
+    <div class="sidebar">
+      <div class="logo">🔎 FridgeToTable</div>
+      <a href="/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+      <a href="/scan"><i data-lucide="camera"></i> Scan Fridge</a>
+      <a href="/ingredients"><i data-lucide="carrot"></i> Ingredients</a>
+      <a href="/suggestions"
+        ><i data-lucide="utensils"></i> Recipe Suggestions</a
+      >
+      <a class="active" href="/saved"
+        ><i data-lucide="heart"></i> Saved Recipes</a
+      >
+      <a><i data-lucide="history"></i> Cooking History</a>
+      <a><i data-lucide="apple"></i> Nutrition Info</a>
+      <a href="/profile"><i data-lucide="user"></i> Profile</a>
+      <br />
+      <a href="/logout" class="logout"><i data-lucide="log-out"></i> Logout</a>
+    </div>
+
+    <div class="topbar">
+      <div></div>
+      <div class="top-right">
+        <i data-lucide="user"></i>
+        <span>{{ user }}</span>
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          ☀️ Light
+        </button>
+        <i data-lucide="menu"></i>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="chat-box">
+        <h2 style="color: #333">Saved Recipes</h2>
+
+        {% if recipes %}
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 12px;
+          "
+        >
+          {% for r in recipes %}
+          <div
+            style="
+              border: 1px solid #ddd;
+              padding: 12px;
+              border-radius: 10px;
+              background: #f4f5f7;
+              color: #333;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <strong style="font-size: 15px"
+                >Saved on {{ r.created_at.strftime('%Y-%m-%d %H:%M:%S')
+                }}</strong
+              >
+              <form
+                method="POST"
+                action="/like_recipe/{{ r.id }}"
+                style="display: inline"
+              >
+                <button
+                  type="submit"
+                  style="background: {{ '#2ecc71' if r.liked else '#7f8c8d' }}; color: white; border:none; border-radius:5px; padding:3px 7px;"
+                >
+                  {{ 'Liked' if r.liked else 'Like' }}
+                </button>
+              </form>
+            </div>
+            <p style="white-space: pre-wrap; margin-top: 8px">
+              {{ r.recipe_text }}
+            </p>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: #333">
+          No saved recipes yet. Use Scan Fridge to get AI recipes, then use Save
+          Recipe.
+        </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

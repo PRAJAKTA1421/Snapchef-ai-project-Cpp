@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Scan Fridge</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+
+  <body class="dashboard-body">
+    <!-- ===== SIDEBAR ===== -->
+    <div class="sidebar">
+      <div class="logo">🔎 FridgeToTable</div>
+
+      <a href="/dashboard">
+        <i data-lucide="layout-dashboard"></i> Dashboard
+      </a>
+
+      <a href="/scan" class="active">
+        <i data-lucide="camera"></i> Scan Fridge
+      </a>
+
+      <a href="/ingredients"><i data-lucide="carrot"></i> Ingredients</a>
+      <a href="/suggestions"
+        ><i data-lucide="utensils"></i> Recipe Suggestions</a
+      >
+      <a href="/saved"><i data-lucide="heart"></i> Saved Recipes</a>
+      <a><i data-lucide="history"></i> Cooking History</a>
+      <a><i data-lucide="apple"></i> Nutrition Info</a>
+      <a href="/profile"><i data-lucide="user"></i> Profile</a>
+
+      <br />
+      <a href="/logout" class="logout">
+        <i data-lucide="log-out"></i> Logout
+      </a>
+    </div>
+
+    <!-- ===== TOPBAR ===== -->
+    <div class="topbar">
+      <div></div>
+
+      <div class="top-right">
+        <i data-lucide="user"></i>
+        <span>{{ user }}</span>
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          ☀️ Light
+        </button>
+        <i data-lucide="menu"></i>
+      </div>
+    </div>
+
+    <!-- ===== CHAT AREA ===== -->
+    <div class="main">
+      <div class="chat-box">
+        {% for msg in messages %}
+        <div class="message {{ msg.type }}">
+          {% if msg.image %}
+          <img src="{{ msg.image }}" />
+          {% endif %}
+
+          <p>{{ msg.text | replace('\n', '<br />') | safe }}</p>
+
+          {% if msg.type == 'bot' %}
+          <form
+            method="POST"
+            action="/save_recipe"
+            style="margin-top: 8px; display: inline"
+          >
+            <input type="hidden" name="recipe_text" value="{{ msg.text }}" />
+            <button
+              type="submit"
+              style="
+                padding: 5px 9px;
+                background: #f39c12;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+              "
+            >
+              Save Recipe
+            </button>
+          </form>
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <form
+          method="POST"
+          action="/scan"
+          enctype="multipart/form-data"
+          id="uploadForm"
+          class="chat-input"
+        >
+          <div class="chat-input-box">
+            <!-- PLUS -->
+            <div class="plus-btn" onclick="toggleMenu()">+</div>
+
+            <!-- DROPDOWN -->
+            <div class="upload-menu" id="uploadMenu">
+              <label>
+                📎 Add photos & files
+                <input type="file" name="image" id="fileInput" hidden />
+              </label>
+            </div>
+
+            <!-- PREVIEW -->
+            <img
+              id="preview"
+              style="display: none; width: 40px; border-radius: 8px"
+            />
+
+            <!-- TEXT -->
+            <input
+              type="text"
+              name="message"
+              placeholder="Ask anything"
+              id="textInput"
+            />
+
+            <!-- MIC -->
+            <i data-lucide="mic" class="icon" onclick="startMic()"></i>
+
+            <!-- SEND -->
+            <button type="submit" class="send-btn">
+              <i data-lucide="send"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== JS ===== -->
+    <script>
+      function toggleMenu() {
+        const menu = document.getElementById("uploadMenu");
+        menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+      }
+    </script>
+
+    <script>
+      const fileInput = document.getElementById("fileInput");
+      const preview = document.getElementById("preview");
+
+      fileInput.addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+          preview.src = URL.createObjectURL(file);
+          preview.style.display = "block";
+        }
+      });
+    </script>
+
+    <script>
+      function startMic() {
+        const recognition = new (
+          window.SpeechRecognition || window.webkitSpeechRecognition
+        )();
+
+        recognition.lang = "en-IN";
+
+        recognition.onresult = function (event) {
+          document.getElementById("textInput").value =
+            event.results[0][0].transcript;
+        };
+
+        recognition.start();
+      }
+    </script>
+
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>
