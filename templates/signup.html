@@ -31,17 +31,37 @@
     <div class="auth-card">
       <h2>Signup</h2>
 
+      {% if error_message %}
+      <div class="auth-error">{{ error_message }}</div>
+      {% endif %}
+
       <form method="POST">
         <div class="input-group">
-          <input type="text" name="username" placeholder="Username" required />
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value="{{ request.form.get('username', '') }}"
+            required
+          />
         </div>
 
         <div class="input-group">
-          <input type="text" name="full_name" placeholder="Full Name" />
+          <input
+            type="text"
+            name="full_name"
+            placeholder="Full Name"
+            value="{{ request.form.get('full_name', '') }}"
+          />
         </div>
 
         <div class="input-group">
-          <input type="email" name="email" placeholder="Email" />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value="{{ request.form.get('email', '') }}"
+          />
         </div>
 
         <div class="input-group">

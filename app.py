@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, send_from_directory, g, jsonify
+from flask import Flask, render_template, request, redirect, session, send_from_directory, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
@@ -17,12 +17,27 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "snapchef_secret")
 
 # ================= DATABASE CONFIG =================
-# Use absolute path to avoid "instance" default path mismatch
-database_path = os.path.join(app.root_path, "snapchef.db")
-database_url = "sqlite:///" + database_path.replace('\\', '/')
+os.makedirs(app.instance_path, exist_ok=True)
+
+database_url = os.getenv("DATABASE_URL")
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+if not database_url:
+    database_path = os.path.join(app.instance_path, "snapchef.db")
+    database_url = "sqlite:///" + database_path.replace('\\', '/')
+
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
+
+def is_sqlite_database():
+    return app.config["SQLALCHEMY_DATABASE_URI"].startswith("sqlite:///")
+
+
+def is_readonly_database_error(error):
+    return "readonly database" in str(error).lower()
 
 # ================= MODELS =================
 class User(db.Model):
@@ -74,6 +89,11 @@ class SavedRecipe(db.Model):
 
 # ================= SCHEMA MIGRATION =================
 def ensure_schema():
+    if not is_sqlite_database():
+        db.create_all()
+        print("[INFO] Schema check completed for non-SQLite database.")
+        return
+
     db_file = db.engine.url.database
 
     if not os.path.exists(db_file):
@@ -125,18 +145,20 @@ def ensure_schema():
 
         print("[INFO] Schema is up to date.")
 
-@app.before_request
-def before_request_schema_check():
-    if not hasattr(g, "schema_checked"):
+
+def initialize_database():
+    with app.app_context():
         try:
             ensure_schema()
-            g.schema_checked = True
         except OperationalError as e:
-            print(f"[ERROR] OperationalError during before_request schema check: {e}")
             db.session.rollback()
-            db.drop_all()
-            db.create_all()
-            g.schema_checked = True
+            if is_readonly_database_error(e):
+                print(f"[WARN] Database is read-only during startup: {e}")
+            else:
+                raise
+
+
+initialize_database()
 
 # ================= CONFIG =================
 UPLOAD_FOLDER = "static/uploads"
@@ -544,13 +566,13 @@ def signup():
         confirm_password = request.form["confirm_password"]
 
         if password != confirm_password:
-            return "Passwords do not match!"
+            return render_template("signup.html", error_message="Passwords do not match!"), 400
 
         if User.query.filter_by(username=username).first():
-            return "Username already exists!"
+            return render_template("signup.html", error_message="Username already exists!"), 400
 
         if email and User.query.filter_by(email=email).first():
-            return "Email already exists!"
+            return render_template("signup.html", error_message="Email already exists!"), 400
 
         hashed_password = generate_password_hash(password)
         new_user = User(username=username, full_name=full_name, email=email, password=hashed_password)
@@ -559,9 +581,17 @@ def signup():
             db.session.add(new_user)
             db.session.commit()
             return redirect("/login")
-        except Exception as e:
+        except OperationalError as e:
             db.session.rollback()
-            return f"Error creating user: {str(e)}"
+            if is_readonly_database_error(e):
+                return render_template(
+                    "signup.html",
+                    error_message="Registration is temporarily unavailable on this deployment because the database is read-only. Add a hosted DATABASE_URL to enable signups."
+                ), 503
+            return render_template("signup.html", error_message="We couldn't create your account right now. Please try again."), 500
+        except Exception:
+            db.session.rollback()
+            return render_template("signup.html", error_message="We couldn't create your account right now. Please try again."), 500
 
     return render_template("signup.html")
 
