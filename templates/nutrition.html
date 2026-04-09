@@ -1,0 +1,229 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Nutrition Info</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+
+  <body class="dashboard-body">
+    <div class="sidebar">
+      <div class="logo">SnapChef Ai</div>
+      <a href="/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+      <a href="/scan"><i data-lucide="camera"></i> Scan Fridge</a>
+      <a href="/ingredients"><i data-lucide="carrot"></i> Ingredients</a>
+      <a href="/suggestions"
+        ><i data-lucide="utensils"></i> Recipe Suggestions</a
+      >
+      <a href="/saved"><i data-lucide="heart"></i> Saved Recipes</a>
+      <a href="/history"><i data-lucide="history"></i> Cooking History</a>
+      <a class="active" href="/nutrition"
+        ><i data-lucide="apple"></i> Nutrition Info</a
+      >
+      <a href="/profile"><i data-lucide="user"></i> Profile</a>
+      <br />
+      <a href="/logout" class="logout"><i data-lucide="log-out"></i> Logout</a>
+    </div>
+
+    <div class="topbar">
+      <div></div>
+      <div class="top-right">
+        <i data-lucide="user"></i>
+        <span>{{ user }}</span>
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          Light
+        </button>
+        <button
+          type="button"
+          class="menu-toggle"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+        >
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="main nutrition-page-shell">
+      <section class="nutrition-hero">
+        <div>
+          <h1>Nutrition Info</h1>
+          <p>
+            See how your current ingredients shape your pantry nutrition
+            profile, key food groups, and health-focused reminders based on what
+            you store.
+          </p>
+        </div>
+        <div class="nutrition-pill-row">
+          <span class="nutrition-pill">
+            <i data-lucide="sparkles"></i> {{ total_ingredients }} ingredients
+            tracked
+          </span>
+          <span class="nutrition-pill">
+            <i data-lucide="shield-alert"></i> {{ warnings }} caution flags
+          </span>
+          <span class="nutrition-pill">
+            <i data-lucide="utensils-crossed"></i> {{ dietary_preference or 'No
+            diet set' }}
+          </span>
+        </div>
+      </section>
+
+      <section class="nutrition-stats-grid">
+        <article class="nutrition-stat-card">
+          <span>Protein-rich items</span>
+          <strong>{{ category_counts["Protein"] }}</strong>
+        </article>
+        <article class="nutrition-stat-card">
+          <span>Vegetables</span>
+          <strong>{{ category_counts["Vegetables"] }}</strong>
+        </article>
+        <article class="nutrition-stat-card">
+          <span>Fruits</span>
+          <strong>{{ category_counts["Fruits"] }}</strong>
+        </article>
+        <article class="nutrition-stat-card">
+          <span>Dairy</span>
+          <strong>{{ category_counts["Dairy"] }}</strong>
+        </article>
+      </section>
+
+      <section class="nutrition-grid">
+        <article class="nutrition-card nutrition-chart-card">
+          <div class="nutrition-card-header">
+            <div>
+              <h2>Nutrition Balance</h2>
+              <p>
+                Simple category mix from the ingredients currently in your
+                pantry.
+              </p>
+            </div>
+          </div>
+          <div class="nutrition-chart-wrap">
+            <canvas id="nutritionChart"></canvas>
+          </div>
+        </article>
+
+        <article class="nutrition-card">
+          <div class="nutrition-card-header">
+            <div>
+              <h2>Nutrition Highlights</h2>
+              <p>
+                Quick strengths and gaps based on the ingredients you already
+                have.
+              </p>
+            </div>
+          </div>
+          <div class="nutrition-list">
+            {% for point in highlight_points %}
+            <div class="nutrition-list-item">{{ point }}</div>
+            {% endfor %}
+          </div>
+        </article>
+
+        <article class="nutrition-card">
+          <div class="nutrition-card-header">
+            <div>
+              <h2>Diet & Allergy Notes</h2>
+              <p>Profile preferences and ingredient warnings in one place.</p>
+            </div>
+          </div>
+          <div class="nutrition-profile-box">
+            <div class="nutrition-profile-row">
+              <span>Dietary preference</span>
+              <strong>{{ dietary_preference or 'Not set' }}</strong>
+            </div>
+            <div class="nutrition-profile-row">
+              <span>Allergies</span>
+              <strong>{{ allergies or 'None added' }}</strong>
+            </div>
+            <div class="nutrition-profile-row">
+              <span>Health warnings</span>
+              <strong>{{ warnings }}</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="nutrition-card" style="grid-column: 1 / -1">
+          <div class="nutrition-card-header">
+            <div>
+              <h2>Ingredient Nutrition View</h2>
+              <p>
+                Each ingredient with its nutrition-oriented analysis preview.
+              </p>
+            </div>
+          </div>
+
+          {% if ingredients %}
+          <div class="nutrition-ingredient-grid">
+            {% for ing in ingredients %}
+            <div class="nutrition-ingredient-card">
+              <div class="nutrition-ingredient-top">
+                <h3>{{ ing.name }}</h3>
+                <span class="nutrition-tag"
+                  >{{ classified_categories.get(ing.id, "Other") }}</span
+                >
+              </div>
+              <p>
+                {{ ing.health_analysis | default("Nutrition analysis not
+                available yet.") | replace('\n', ' ') | truncate(180) }}
+              </p>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-state">
+            No ingredients tracked yet. Add items first to unlock nutrition
+            insights.
+          </div>
+          {% endif %}
+        </article>
+      </section>
+    </div>
+
+    {% include "_chatbot.html" %}
+    <script src="{{ url_for('static', filename='chatbot.js') }}"></script>
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <script>
+      lucide.createIcons();
+
+      const ctx = document.getElementById("nutritionChart");
+      if (ctx) {
+        new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: {{ chart_labels | tojson }},
+            datasets: [{
+              data: {{ chart_data | tojson }},
+              backgroundColor: [
+                "#22c55e",
+                "#38bdf8",
+                "#f59e0b",
+                "#f97316",
+                "#e879f9",
+                "#f43f5e",
+                "#94a3b8"
+              ],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: {
+                  color: "#94a3b8"
+                }
+              }
+            }
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

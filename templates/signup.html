@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Signup</title>
+    <title>Register</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='style.css') }}"
@@ -9,8 +9,9 @@
   </head>
 
   <body class="auth-body">
+    <div class="auth-particles"></div>
     <div class="auth-navbar">
-      <div class="brand">SnapChef</div>
+      <div class="brand">ShapChef AI</div>
       <div class="nav-links">
         <a href="/login">Login</a>
         <a href="/signup">Register</a>
@@ -24,7 +25,7 @@
 
     <div class="auth-header">
       <h1>Create Account</h1>
-      <p>Join SnapChef AI</p>
+      <p>Join ShapChef AI</p>
     </div>
 
     <div class="auth-card">
@@ -61,7 +62,7 @@
           />
         </div>
 
-        <button class="auth-btn">Signup</button>
+        <button class="auth-btn">Register</button>
       </form>
     </div>
     <script src="{{ url_for('static', filename='theme.js') }}"></script>

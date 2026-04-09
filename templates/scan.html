@@ -10,10 +10,10 @@
     <script src="https://unpkg.com/lucide@latest"></script>
   </head>
 
-  <body class="dashboard-body">
+  <body class="dashboard-body scan-page">
     <!-- ===== SIDEBAR ===== -->
     <div class="sidebar">
-      <div class="logo">🔎 FridgeToTable</div>
+      <div class="logo">SnapChef Ai</div>
 
       <a href="/dashboard">
         <i data-lucide="layout-dashboard"></i> Dashboard
@@ -28,8 +28,8 @@
         ><i data-lucide="utensils"></i> Recipe Suggestions</a
       >
       <a href="/saved"><i data-lucide="heart"></i> Saved Recipes</a>
-      <a><i data-lucide="history"></i> Cooking History</a>
-      <a><i data-lucide="apple"></i> Nutrition Info</a>
+      <a href="/history"><i data-lucide="history"></i> Cooking History</a>
+      <a href="/nutrition"><i data-lucide="apple"></i> Nutrition Info</a>
       <a href="/profile"><i data-lucide="user"></i> Profile</a>
 
       <br />
@@ -48,7 +48,14 @@
         <button id="theme-toggle" class="theme-toggle" type="button">
           ☀️ Light
         </button>
-        <i data-lucide="menu"></i>
+        <button
+          type="button"
+          class="menu-toggle"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+        >
+          <i data-lucide="menu"></i>
+        </button>
       </div>
     </div>
 
@@ -171,6 +178,8 @@
       }
     </script>
 
+    {% include "_chatbot.html" %}
+    <script src="{{ url_for('static', filename='chatbot.js') }}"></script>
     <script src="{{ url_for('static', filename='theme.js') }}"></script>
     <script>
       lucide.createIcons();

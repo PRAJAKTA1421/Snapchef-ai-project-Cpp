@@ -1,0 +1,49 @@
+<div class="snapchef-chatbot" data-chatbot-root>
+  <button
+    class="chatbot-toggle"
+    type="button"
+    aria-label="Open SnapChef assistant"
+    aria-expanded="false"
+    data-chatbot-toggle
+  >
+    <i data-lucide="message-circle-more"></i>
+    <span>Chef Bot</span>
+  </button>
+
+  <section class="chatbot-panel" hidden data-chatbot-panel>
+    <div class="chatbot-header">
+      <div>
+        <strong>SnapChef Assistant</strong>
+        <p>Ask about recipes, ingredients, or nutrition.</p>
+      </div>
+      <button
+        class="chatbot-close"
+        type="button"
+        aria-label="Close chat"
+        data-chatbot-close
+      >
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <div class="chatbot-messages" data-chatbot-messages>
+      <article class="chatbot-message bot">
+        Tell me what you have at home, what you want to cook, or ask for a quick
+        food tip.
+      </article>
+    </div>
+
+    <form class="chatbot-form" data-chatbot-form>
+      <input
+        class="chatbot-input"
+        type="text"
+        name="message"
+        placeholder="Ask SnapChef anything food-related..."
+        autocomplete="off"
+      />
+      <button class="chatbot-send" type="submit">
+        <i data-lucide="send"></i>
+      </button>
+    </form>
+  </section>
+</div>

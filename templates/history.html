@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Cooking History</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+    <script src="https://unpkg.com/lucide@latest"></script>
+  </head>
+
+  <body class="dashboard-body">
+    <div class="sidebar">
+      <div class="logo">SnapChef Ai</div>
+      <a href="/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+      <a href="/scan"><i data-lucide="camera"></i> Scan Fridge</a>
+      <a href="/ingredients"><i data-lucide="carrot"></i> Ingredients</a>
+      <a href="/suggestions"
+        ><i data-lucide="utensils"></i> Recipe Suggestions</a
+      >
+      <a href="/saved"><i data-lucide="heart"></i> Saved Recipes</a>
+      <a class="active" href="/history"
+        ><i data-lucide="history"></i> Cooking History</a
+      >
+      <a href="/nutrition"><i data-lucide="apple"></i> Nutrition Info</a>
+      <a href="/profile"><i data-lucide="user"></i> Profile</a>
+      <br />
+      <a href="/logout" class="logout"><i data-lucide="log-out"></i> Logout</a>
+    </div>
+
+    <div class="topbar">
+      <div></div>
+      <div class="top-right">
+        <i data-lucide="user"></i>
+        <span>{{ user }}</span>
+        <button id="theme-toggle" class="theme-toggle" type="button">
+          Light
+        </button>
+        <button
+          type="button"
+          class="menu-toggle"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+        >
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="main history-page-shell">
+      <section class="history-hero">
+        <div>
+          <h1>Cooking History</h1>
+          <p>
+            Track the recipes you’ve saved, spot recent cooking patterns, and
+            revisit dishes you liked before.
+          </p>
+        </div>
+        <div class="history-pill-row">
+          <span class="history-pill"
+            ><i data-lucide="book-open"></i> {{ total_recipes }} logged
+            recipes</span
+          >
+          <span class="history-pill"
+            ><i data-lucide="heart"></i> {{ liked_recipes }} liked dishes</span
+          >
+          <span class="history-pill"
+            ><i data-lucide="calendar-days"></i> {{ active_days }} active
+            cooking days</span
+          >
+        </div>
+      </section>
+
+      <section class="history-stats-grid">
+        <article class="history-stat-card">
+          <span>Total saved recipes</span>
+          <strong>{{ total_recipes }}</strong>
+        </article>
+        <article class="history-stat-card">
+          <span>Liked recipes</span>
+          <strong>{{ liked_recipes }}</strong>
+        </article>
+        <article class="history-stat-card">
+          <span>This month</span>
+          <strong>{{ monthly_recipes }}</strong>
+        </article>
+        <article class="history-stat-card">
+          <span>Latest save</span>
+          <strong>{{ latest_saved or "No activity" }}</strong>
+        </article>
+      </section>
+
+      <section class="history-grid">
+        <article class="history-card">
+          <div class="history-card-header">
+            <div>
+              <h2>Recent Cooking Timeline</h2>
+              <p>Your latest recipe saves in timeline form.</p>
+            </div>
+          </div>
+
+          {% if timeline %}
+          <div class="history-timeline">
+            {% for entry in timeline %}
+            <div class="timeline-item">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <div class="timeline-head">
+                  <strong>{{ entry.title }}</strong>
+                  <span>{{ entry.date }}</span>
+                </div>
+                <p>{{ entry.preview }}</p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-state">
+            No cooking history yet. Save recipes from Scan Fridge or Suggestions
+            to build your timeline.
+          </div>
+          {% endif %}
+        </article>
+
+        <article class="history-card">
+          <div class="history-card-header">
+            <div>
+              <h2>History Insights</h2>
+              <p>Quick signals from your saved recipe activity.</p>
+            </div>
+          </div>
+          <div class="history-insight-list">
+            {% for point in insight_points %}
+            <div class="history-insight-item">{{ point }}</div>
+            {% endfor %}
+          </div>
+        </article>
+
+        <article class="history-card" style="grid-column: 1 / -1">
+          <div class="history-card-header">
+            <div>
+              <h2>Recipe Archive</h2>
+              <p>All saved recipes with timestamps and like status.</p>
+            </div>
+          </div>
+
+          {% if recipes %}
+          <div class="history-archive-grid">
+            {% for recipe in recipes %}
+            <div class="history-recipe-card">
+              <div class="history-recipe-top">
+                <div>
+                  <h3>{{ recipe.display_title }}</h3>
+                  <span
+                    >{{ recipe.created_at.strftime('%d %b %Y, %I:%M %p')
+                    }}</span
+                  >
+                </div>
+                <span
+                  class="history-tag {{ 'is-liked' if recipe.liked else '' }}"
+                >
+                  {{ 'Liked' if recipe.liked else 'Saved' }}
+                </span>
+              </div>
+              <p>{{ recipe.recipe_text | truncate(220) }}</p>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-state">No saved recipes found yet.</div>
+          {% endif %}
+        </article>
+      </section>
+    </div>
+
+    {% include "_chatbot.html" %}
+    <script src="{{ url_for('static', filename='chatbot.js') }}"></script>
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

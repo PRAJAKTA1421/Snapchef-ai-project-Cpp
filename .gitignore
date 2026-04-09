@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+instance/
+snapchef.db
+*.db
+static/uploads/
+.DS_Store
+Thumbs.db

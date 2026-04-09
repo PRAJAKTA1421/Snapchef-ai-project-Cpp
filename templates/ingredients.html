@@ -11,7 +11,8 @@
 
   <body class="dashboard-body">
     <div class="sidebar">
-      <div class="logo">🔎 FridgeToTable</div>
+      <div class="logo">SnapChef Ai</div>
+
       <a href="/dashboard"><i data-lucide="layout-dashboard"></i> Dashboard</a>
       <a href="/scan"><i data-lucide="camera"></i> Scan Fridge</a>
       <a class="active" href="/ingredients"
@@ -21,8 +22,8 @@
         ><i data-lucide="utensils"></i> Recipe Suggestions</a
       >
       <a href="/saved"><i data-lucide="heart"></i> Saved Recipes</a>
-      <a><i data-lucide="history"></i> Cooking History</a>
-      <a><i data-lucide="apple"></i> Nutrition Info</a>
+      <a href="/history"><i data-lucide="history"></i> Cooking History</a>
+      <a href="/nutrition"><i data-lucide="apple"></i> Nutrition Info</a>
       <a href="/profile"><i data-lucide="user"></i> Profile</a>
       <br />
       <a href="/logout" class="logout"><i data-lucide="log-out"></i> Logout</a>
@@ -34,277 +35,477 @@
         <i data-lucide="user"></i>
         <span>{{ user }}</span>
         <button id="theme-toggle" class="theme-toggle" type="button">
-          ☀️ Light
+          Light
         </button>
-        <i data-lucide="menu"></i>
+        <button
+          type="button"
+          class="menu-toggle"
+          aria-label="Open navigation menu"
+          aria-expanded="false"
+        >
+          <i data-lucide="menu"></i>
+        </button>
       </div>
     </div>
 
     <div class="main">
-      <div class="chat-box">
-        <h2 style="color: #333">Ingredient List</h2>
+      <div class="ingredients-page-shell">
+        <section class="ingredients-hero">
+          <h1>Advanced Ingredient Intelligence</h1>
+          <p>
+            Use the controls below to mark ingredient quantity and expiry. The
+            three smart features update instantly from that data.
+          </p>
 
-        <!-- Add Ingredient Form -->
-        <form
-          method="POST"
-          action="/add_ingredient"
-          style="
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-          "
-        >
-          <h3 style="color: #333">Add New Ingredient</h3>
-          <input
-            type="text"
-            name="ingredient_name"
-            placeholder="Enter ingredient name"
-            required
-            style="
-              padding: 8px;
-              margin-right: 10px;
-              border: 1px solid #ccc;
-              border-radius: 4px;
-            "
-          />
-          <button
-            type="submit"
-            style="
-              padding: 8px 15px;
-              background: #4caf50;
-              color: white;
-              border: none;
-              border-radius: 4px;
-              cursor: pointer;
-            "
-          >
-            Add Ingredient
-          </button>
-        </form>
+          {% if ingredients %}
+          <div class="ingredients-strip">
+            {% for item in ingredients %}
+            <span class="ingredient-pill">{{ item.name }}</span>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty-state" style="margin-top: 18px">
+            No ingredients found yet. Add ingredients from the scan page to
+            power these smart features.
+          </div>
+          {% endif %}
+        </section>
 
-        {% if ingredients %}
-        <div
-          style="
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 15px;
-          "
-        >
-          {% for item in ingredients %}
-          <div
-            style="
-              border: 1px solid #eee;
-              padding: 15px;
-              border-radius: 8px;
-              background: #f9f9f9;
-              color: #333;
-            "
-          >
+        <section class="setup-card">
+          <h2>Ingredient Inputs</h2>
+          <p>
+            Set quantity and expiry for each ingredient. Low quantity feeds the
+            grocery list, expired items feed waste tracking, and both improve
+            recipe guidance.
+          </p>
+          {% if ingredients %}
+          <div class="setup-grid" id="setupGrid">
+            {% for item in ingredients %}
             <div
-              style="
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 10px;
-              "
+              class="ingredient-setup-item"
+              data-id="{{ item.id }}"
+              data-name="{{ item.name }}"
             >
-              <span style="font-weight: bold; font-size: 16px; color: #333"
-                >{{ item.name }}</span
-              >
-              <form
-                method="POST"
-                action="/delete_ingredient/{{ item.id }}"
-                style="display: inline"
-              >
-                <button
-                  type="submit"
-                  style="
-                    background: #f44336;
-                    color: white;
-                    border: none;
-                    padding: 2px 6px;
-                    border-radius: 3px;
-                    cursor: pointer;
-                    font-size: 12px;
-                  "
-                >
-                  ×
-                </button>
-              </form>
-            </div>
-
-            {% if item.health_analysis %}
-            <div
-              style="
-                background: white;
-                padding: 10px;
-                border-radius: 6px;
-                border-left: 4px solid #4caf50;
-                margin-top: 10px;
-              "
-            >
-              <h4 style="margin: 0 0 8px 0; color: #2e7d32; font-size: 14px">
-                🏥 Health Analysis
-              </h4>
-              <div style="font-size: 13px; line-height: 1.4; color: #555">
-                {{ item.health_analysis | replace('\n', '<br />') | safe }}
+              <h4>{{ item.name }}</h4>
+              <div class="setup-fields">
+                <input
+                  class="setup-input"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  placeholder="Qty"
+                  data-role="qty"
+                />
+                <input class="setup-date" type="date" data-role="expiry" />
               </div>
+              <div class="setup-status" data-role="status">Normal stock</div>
             </div>
-            {% endif %}
+            {% endfor %}
           </div>
-          {% endfor %}
-        </div>
-        {% else %}
-        <p style="color: #333">
-          No ingredients found yet. Add some by typing them in the Scan box
-          (comma-separated or new lines).
-        </p>
+          {% else %}
+          <div class="empty-state">
+            Add ingredients first, then this page will let you manage low stock
+            and expiry directly.
+          </div>
+          {% endif %}
+        </section>
 
-        <!-- Quick Add Unique Ingredients -->
-        <div style="margin-top: 20px">
-          <h3 style="color: #333">Quick Add Unique Ingredients</h3>
-          <div style="display: flex; flex-wrap: wrap; gap: 10px">
-            <form
-              method="POST"
-              action="/add_ingredient"
-              style="display: inline"
-            >
-              <input type="hidden" name="ingredient_name" value="Truffle Oil" />
-              <button
-                type="submit"
-                style="
-                  padding: 5px 10px;
-                  background: #ff6b6b;
-                  color: white;
-                  border: none;
-                  border-radius: 15px;
-                  cursor: pointer;
-                "
-              >
-                🍄 Truffle Oil
-              </button>
-            </form>
-            <form
-              method="POST"
-              action="/add_ingredient"
-              style="display: inline"
-            >
+        <section class="feature-grid">
+          <article class="feature-card">
+            <h2>Suggestions Based on Ingredients</h2>
+            <p>
+              Recipe ideas generated from what is already in your ingredient
+              list.
+            </p>
+            <span class="feature-value" id="recipeCount">0 recipes</span>
+            <div class="feature-stack" id="recipeMatches"></div>
+            <div class="feature-list" id="recipeInsights"></div>
+          </article>
+
+          <article class="feature-card">
+            <h2>Shopping List</h2>
+            <p>
+              Create your own grocery list before going to the market, then
+              tick items off as you buy them.
+            </p>
+            <span class="feature-value" id="groceryCount">0 items</span>
+            <div class="feature-input-row">
               <input
-                type="hidden"
-                name="ingredient_name"
-                value="Saffron Threads"
+                class="feature-text-input"
+                id="groceryItemInput"
+                type="text"
+                placeholder="Add grocery item"
               />
-              <button
-                type="submit"
-                style="
-                  padding: 5px 10px;
-                  background: #ffd93d;
-                  color: black;
-                  border: none;
-                  border-radius: 15px;
-                  cursor: pointer;
-                "
-              >
-                🌸 Saffron
+              <button class="feature-btn" id="addGroceryBtn" type="button">
+                Add item
               </button>
-            </form>
-            <form
-              method="POST"
-              action="/add_ingredient"
-              style="display: inline"
-            >
-              <input
-                type="hidden"
-                name="ingredient_name"
-                value="Goji Berries"
-              />
+            </div>
+            <div class="feature-actions">
               <button
-                type="submit"
-                style="
-                  padding: 5px 10px;
-                  background: #ff8e53;
-                  color: white;
-                  border: none;
-                  border-radius: 15px;
-                  cursor: pointer;
-                "
+                class="feature-btn secondary"
+                id="clearGroceryBtn"
+                type="button"
               >
-                🫐 Goji Berries
+                Clear list
               </button>
-            </form>
-            <form
-              method="POST"
-              action="/add_ingredient"
-              style="display: inline"
-            >
-              <input
-                type="hidden"
-                name="ingredient_name"
-                value="Matcha Powder"
-              />
-              <button
-                type="submit"
-                style="
-                  padding: 5px 10px;
-                  background: #4ecdc4;
-                  color: white;
-                  border: none;
-                  border-radius: 15px;
-                  cursor: pointer;
-                "
-              >
-                🍵 Matcha
-              </button>
-            </form>
-            <form
-              method="POST"
-              action="/add_ingredient"
-              style="display: inline"
-            >
-              <input type="hidden" name="ingredient_name" value="Quinoa" />
-              <button
-                type="submit"
-                style="
-                  padding: 5px 10px;
-                  background: #45b7d1;
-                  color: white;
-                  border: none;
-                  border-radius: 15px;
-                  cursor: pointer;
-                "
-              >
-                🌾 Quinoa
-              </button>
-            </form>
-            <form
-              method="POST"
-              action="/add_ingredient"
-              style="display: inline"
-            >
-              <input type="hidden" name="ingredient_name" value="Kale" />
-              <button
-                type="submit"
-                style="
-                  padding: 5px 10px;
-                  background: #96ceb4;
-                  color: white;
-                  border: none;
-                  border-radius: 15px;
-                  cursor: pointer;
-                "
-              >
-                🥬 Kale
-              </button>
-            </form>
-          </div>
-        </div>
-        {% endif %}
+            </div>
+            <div class="feature-stack" id="groceryChecklist"></div>
+            <div class="feature-list" id="groceryInsights"></div>
+          </article>
+
+          <article class="feature-card">
+            <h2>Waste Tracking</h2>
+            <p>
+              Track expired and expiring-soon ingredients so you can use them in
+              time.
+            </p>
+            <span class="feature-value" id="wasteCount">0 expired</span>
+            <div class="feature-stack" id="wasteSummary"></div>
+            <div class="feature-list" id="wasteInsights"></div>
+          </article>
+        </section>
       </div>
     </div>
 
+    {% include "_chatbot.html" %}
+    <script src="{{ url_for('static', filename='chatbot.js') }}"></script>
     <script src="{{ url_for('static', filename='theme.js') }}"></script>
     <script>
+      const ingredientNames = [
+        {% for item in ingredients %}
+        "{{ item.name|escape }}",
+        {% endfor %}
+      ];
+
+      const staples = ["onion", "garlic", "tomato", "milk", "eggs", "rice"];
+      const recipeCountNode = document.getElementById("recipeCount");
+      const groceryCountNode = document.getElementById("groceryCount");
+      const wasteCountNode = document.getElementById("wasteCount");
+      const recipeInsights = document.getElementById("recipeInsights");
+      const groceryInsights = document.getElementById("groceryInsights");
+      const wasteInsights = document.getElementById("wasteInsights");
+      const recipeMatches = document.getElementById("recipeMatches");
+      const groceryChecklist = document.getElementById("groceryChecklist");
+      const wasteSummary = document.getElementById("wasteSummary");
+      const groceryItemInput = document.getElementById("groceryItemInput");
+      const addGroceryBtn = document.getElementById("addGroceryBtn");
+      const clearGroceryBtn = document.getElementById("clearGroceryBtn");
+      const setupItems = Array.from(document.querySelectorAll(".ingredient-setup-item"));
+      const recipeLibrary = [
+        { name: "Masala Rice Bowl", needs: ["rice", "onion", "tomato"] },
+        { name: "Tomato Egg Bhurji", needs: ["eggs", "tomato", "onion"] },
+        { name: "Creamy Milk Oats", needs: ["milk"] },
+        { name: "Garlic Tomato Curry", needs: ["garlic", "tomato", "onion"] },
+        { name: "Quick Curd Bowl", needs: ["dahi"] },
+        { name: "Veg Stir Fry", needs: ["onion", "garlic"] }
+      ];
+
+      function normalize(value) {
+        return (value || "").trim().toLowerCase();
+      }
+
+      function storageKey(id) {
+        return `snapchef-ingredient-meta-${id}`;
+      }
+
+      function loadMeta(id) {
+        try {
+          return JSON.parse(localStorage.getItem(storageKey(id))) || {};
+        } catch (error) {
+          return {};
+        }
+      }
+
+      function saveMeta(id, meta) {
+        localStorage.setItem(storageKey(id), JSON.stringify(meta));
+      }
+
+      function groceryStorageKey() {
+        return "snapchef-grocery-list-{{ user|escape }}";
+      }
+
+      function loadGroceryList() {
+        try {
+          return JSON.parse(localStorage.getItem(groceryStorageKey())) || [];
+        } catch (error) {
+          return [];
+        }
+      }
+
+      function saveGroceryList(items) {
+        localStorage.setItem(groceryStorageKey(), JSON.stringify(items));
+      }
+
+      function getNormalizedIngredients() {
+        return ingredientNames.map(normalize).filter(Boolean);
+      }
+
+      function clearNode(node) {
+        node.innerHTML = "";
+      }
+
+      function pushItem(node, text) {
+        const div = document.createElement("div");
+        div.className = "feature-item";
+        div.textContent = text;
+        node.appendChild(div);
+      }
+
+      function pushFeatureTile(node, title, meta, tone) {
+        const tile = document.createElement("div");
+        tile.className = `feature-tile${tone ? ` ${tone}` : ""}`;
+
+        const heading = document.createElement("strong");
+        heading.textContent = title;
+        tile.appendChild(heading);
+
+        const text = document.createElement("span");
+        text.textContent = meta;
+        tile.appendChild(text);
+
+        node.appendChild(tile);
+      }
+
+      function pushChecklistItem(node, item) {
+        const row = document.createElement("label");
+        row.className = `feature-check${item.done ? " is-done" : ""}`;
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = Boolean(item.done);
+        checkbox.addEventListener("change", function () {
+          const current = loadGroceryList().map((entry) =>
+            normalize(entry.name) === normalize(item.name)
+              ? { ...entry, done: checkbox.checked }
+              : entry
+          );
+          saveGroceryList(current);
+          renderDashboard();
+        });
+        row.appendChild(checkbox);
+
+        const textWrap = document.createElement("span");
+        textWrap.className = "feature-check-text";
+
+        const title = document.createElement("strong");
+        title.textContent = item.name;
+        textWrap.appendChild(title);
+
+        const meta = document.createElement("span");
+        meta.textContent = item.done ? "Picked up" : "Pending";
+        textWrap.appendChild(meta);
+
+        row.appendChild(textWrap);
+        node.appendChild(row);
+      }
+
+      function renderDashboard() {
+        const normalizedIngredients = getNormalizedIngredients();
+        const missingItems = staples.filter(
+          (staple) => !normalizedIngredients.some((name) => name.includes(staple))
+        );
+        const matchedRecipes = recipeLibrary
+          .map((recipe) => {
+            const missing = recipe.needs.filter(
+              (need) => !normalizedIngredients.some((name) => name.includes(need))
+            );
+            return { ...recipe, missing };
+          })
+          .sort((left, right) => left.missing.length - right.missing.length);
+        const estimatedRecipes = normalizedIngredients.length
+          ? Math.max(
+              1,
+              Math.min(
+                12,
+                Math.max(
+                  matchedRecipes.filter((recipe) => recipe.missing.length <= 1).length,
+                  normalizedIngredients.length + 2 - Math.floor(missingItems.length / 2)
+                )
+              )
+            )
+          : 0;
+        const expiredItems = [];
+        const soonItems = [];
+        const groceryList = loadGroceryList();
+        const today = new Date(new Date().toDateString());
+
+        setupItems.forEach((item) => {
+          const id = item.dataset.id;
+          const name = item.dataset.name;
+          const meta = loadMeta(id);
+          const quantity = Number.parseFloat(meta.quantity || "");
+          const expiry = meta.expiry ? new Date(`${meta.expiry}T00:00:00`) : null;
+          const statusNode = item.querySelector('[data-role="status"]');
+
+          if (Number.isFinite(quantity) && quantity >= 0 && quantity <= 2) {
+            statusNode.textContent = "Low stock";
+          } else {
+            statusNode.textContent = "Normal stock";
+          }
+
+          if (expiry && expiry < today) {
+            expiredItems.push(name);
+            statusNode.textContent = "Expired";
+          } else if (expiry) {
+            const diff = Math.ceil((expiry - today) / 86400000);
+            if (diff <= 2) {
+              soonItems.push(name);
+              statusNode.textContent = "Expiring soon";
+            }
+          }
+        });
+
+        recipeCountNode.textContent = `${estimatedRecipes} ${estimatedRecipes === 1 ? "recipe" : "recipes"}`;
+        groceryCountNode.textContent = `${groceryList.filter((item) => !item.done).length} item${groceryList.filter((item) => !item.done).length === 1 ? "" : "s"}`;
+        wasteCountNode.textContent = `${expiredItems.length} expired`;
+
+        clearNode(recipeInsights);
+        clearNode(groceryInsights);
+        clearNode(wasteInsights);
+        clearNode(recipeMatches);
+        clearNode(groceryChecklist);
+        clearNode(wasteSummary);
+
+        if (normalizedIngredients.length) {
+          pushItem(recipeInsights, `You can cook about ${estimatedRecipes} recipes with these ingredients.`);
+          pushItem(
+            recipeInsights,
+            missingItems.length
+              ? `Missing items to unlock more recipes: ${missingItems.slice(0, 4).join(", ")}.`
+              : "You already have the core pantry basics for flexible recipe suggestions."
+          );
+        } else {
+          pushItem(recipeInsights, "Add ingredients first to generate recipe suggestions.");
+        }
+
+        if (matchedRecipes.length) {
+          matchedRecipes.slice(0, 3).forEach((recipe) => {
+            if (recipe.missing.length === 0) {
+              pushFeatureTile(recipeMatches, recipe.name, "Ready with current ingredients", "is-good");
+            } else if (recipe.missing.length === 1) {
+              pushFeatureTile(recipeMatches, recipe.name, `Missing only ${recipe.missing[0]}`, "is-warn");
+            } else {
+              pushFeatureTile(recipeMatches, recipe.name, `Need ${recipe.missing.slice(0, 2).join(", ")}`, "");
+            }
+          });
+        }
+
+        pushItem(
+          groceryInsights,
+          groceryList.length
+            ? "Open this list in the market and tick items off as you buy them."
+            : "Add grocery items manually to build your shopping checklist."
+        );
+        pushItem(
+          groceryInsights,
+          groceryList.length
+            ? `${groceryList.filter((item) => item.done).length} picked, ${groceryList.filter((item) => !item.done).length} remaining in your shopping list.`
+            : "Your shopping list is empty right now."
+        );
+
+        if (groceryList.length) {
+          groceryList.forEach((item) => {
+            pushChecklistItem(groceryChecklist, item);
+          });
+        } else {
+          pushFeatureTile(groceryChecklist, "No grocery items yet", "Add items above and use this list while shopping", "is-good");
+        }
+
+        pushItem(
+          wasteInsights,
+          expiredItems.length
+            ? `Expired ingredients: ${expiredItems.join(", ")}.`
+            : "No expired ingredients detected."
+        );
+        pushItem(
+          wasteInsights,
+          expiredItems.length
+            ? "Usage habit tip: buy smaller quantities or cook expiring items earlier in the week."
+            : "Usage habit tip: keep assigning expiry dates to maintain low food waste."
+        );
+
+        if (expiredItems.length) {
+          expiredItems.forEach((item) => {
+            pushFeatureTile(wasteSummary, item, "Expired", "is-danger");
+          });
+        } else if (soonItems.length) {
+          soonItems.forEach((item) => {
+            pushFeatureTile(wasteSummary, item, "Use soon", "is-warn");
+          });
+        } else {
+          pushFeatureTile(wasteSummary, "No waste alerts", "Everything looks safe right now", "is-good");
+        }
+      }
+
+      setupItems.forEach((item) => {
+        const id = item.dataset.id;
+        const quantityInput = item.querySelector('[data-role="qty"]');
+        const expiryInput = item.querySelector('[data-role="expiry"]');
+        const saved = loadMeta(id);
+
+        quantityInput.value = saved.quantity || "";
+        expiryInput.value = saved.expiry || "";
+
+        function persist() {
+          saveMeta(id, {
+            quantity: quantityInput.value,
+            expiry: expiryInput.value
+          });
+          renderDashboard();
+        }
+
+        quantityInput.addEventListener("input", persist);
+        expiryInput.addEventListener("change", persist);
+      });
+
+      function addGroceryItem() {
+        if (!groceryItemInput) {
+          return;
+        }
+
+        const rawName = groceryItemInput.value.trim();
+        if (!rawName) {
+          groceryItemInput.focus();
+          return;
+        }
+
+        const existing = loadGroceryList();
+        const normalizedName = normalize(rawName);
+        if (existing.some((item) => normalize(item.name) === normalizedName)) {
+          groceryItemInput.value = "";
+          groceryItemInput.focus();
+          return;
+        }
+
+        saveGroceryList([...existing, { name: rawName, done: false }]);
+        groceryItemInput.value = "";
+        renderDashboard();
+        groceryItemInput.focus();
+      }
+
+      if (addGroceryBtn) {
+        addGroceryBtn.addEventListener("click", function () {
+          addGroceryItem();
+        });
+      }
+
+      if (groceryItemInput) {
+        groceryItemInput.addEventListener("keydown", function (event) {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            addGroceryItem();
+          }
+        });
+      }
+
+      if (clearGroceryBtn) {
+        clearGroceryBtn.addEventListener("click", function () {
+          saveGroceryList([]);
+          renderDashboard();
+        });
+      }
+
+      renderDashboard();
       lucide.createIcons();
     </script>
   </body>

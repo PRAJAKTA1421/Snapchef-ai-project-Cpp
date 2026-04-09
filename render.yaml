@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: snapchef
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: MISTRAL_API_KEY
+        sync: false
